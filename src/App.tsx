@@ -4,6 +4,9 @@ import React, { useEffect, useState } from 'react';
 import { UserWarning } from './UserWarning';
 import { getTodos, USER_ID } from './api/todos';
 import { Todo } from './types/Todo';
+import { TodoItem } from './components/TodoItem/TodoItem';
+import { TodoFooter } from './components/TodoFooter/TodoFooter';
+
 type Filter = 'all' | 'active' | 'completed';
 
 export const App: React.FC = () => {
@@ -30,6 +33,7 @@ export const App: React.FC = () => {
   }, []);
   const activeTodosCount = todos.filter(todo => !todo.completed).length;
   const completedTodosCount = todos.filter(todo => todo.completed).length;
+
   const visibleTodos = todos.filter(todo => {
     if (filter === 'active') {
       return !todo.completed;
@@ -72,93 +76,18 @@ export const App: React.FC = () => {
         {todos.length > 0 && (
           <section className="todoapp__main" data-cy="TodoList">
             {visibleTodos.map(todo => (
-              <div
-                key={todo.id}
-                data-cy="Todo"
-                className={`todo ${todo.completed ? 'completed' : ''}`}
-              >
-                
-
-                <label className="todo__status-label">
-                  <input
-                    type="checkbox"
-                    className="todo__status"
-                    data-cy="TodoStatus"
-                    checked={todo.completed}
-                    readOnly
-                  />
-                </label>
-
-                <span data-cy="TodoTitle" className="todo__title">
-                  {todo.title}
-                </span>
-                <button
-                  type="button"
-                  className="todo__remove"
-                  data-cy="TodoDelete"
-                >
-                  ×
-                </button>
-
-                <div
-                  data-cy="TodoLoader"
-                  className={`loader ${isLoading ? 'is-active' : ''}`}
-                />
-              </div>
+              <TodoItem key={todo.id} todo={todo} isLoading={isLoading} />
             ))}
           </section>
         )}
 
-        {/* Hide the footer if there are no todos */}
         {todos.length > 0 && (
-          <footer className="todoapp__footer" data-cy="Footer">
-            <span className="todo-count" data-cy="TodosCounter">
-              {activeTodosCount} items left
-            </span>
-
-            <nav className="filter" data-cy="Filter">
-              <a
-                href="#/"
-                className={`filter__link ${filter === 'all' ? 'selected' : ''}`}
-                onClick={() => setFilter('all')}
-                data-cy="FilterLinkAll"
-              >
-                All
-              </a>
-
-              <a
-                href="#/active"
-                className={`filter__link ${
-                  filter === 'active' ? 'selected' : ''
-                }`}
-                onClick={() => setFilter('active')}
-                data-cy="FilterLinkActive"
-              >
-                Active
-              </a>
-
-              <a
-                href="#/completed"
-                className={`filter__link ${
-                  filter === 'completed' ? 'selected' : ''
-                }`}
-                onClick={() => setFilter('completed')}
-                data-cy="FilterLinkCompleted"
-              >
-                Completed
-              </a>
-            </nav>
-
-            {/* this button should be disabled if there are no completed todos */}
-            <button
-              type="button"
-              className="todoapp__clear-completed"
-              data-cy="ClearCompletedButton"
-              disabled={completedTodosCount === 0}
-            >
-              Clear completed
-            </button>
-          </footer>
+          <TodoFooter
+            activeTodosCount={activeTodosCount}
+            completedTodosCount={completedTodosCount}
+            filter={filter}
+            onFilterChange={setFilter}
+          />
         )}
       </div>
 
